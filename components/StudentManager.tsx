@@ -51,14 +51,14 @@ const StudentManager: React.FC = () => {
                 <td className="px-6 py-4">
                   <div className="space-y-2">
                     <div className="flex justify-between text-[10px] font-bold text-slate-500">
-                      <span>{student.progress}% COMPLETADO</span>
+                      <span>{student.progress ?? 0}% COMPLETADO</span>
                     </div>
                     <div className="w-48 h-2 bg-slate-100 rounded-full overflow-hidden">
                       <div 
                         className={`h-full rounded-full transition-all duration-1000 ${
                           student.progress === 100 ? 'bg-emerald-500' : 'bg-blue-500'
                         }`}
-                        style={{ width: `${student.progress}%` }}
+                        style={{ width: `${student.progress ?? 0}%` }}
                       ></div>
                     </div>
                   </div>

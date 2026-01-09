@@ -1,43 +1,77 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
-// Standardized client initialization using process.env.API_KEY directly
 const getAI = () => new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
-export const summarizeTranscript = async (transcript: string) => {
+export const generateQuizFromContent = async (content: string) => {
   const ai = getAI();
   try {
     const response = await ai.models.generateContent({
-      // Using gemini-3-flash-preview for general text summarization
       model: 'gemini-3-flash-preview',
-      contents: `Resume los puntos clave de esta transcripción de clase sobre adopción de IA: \n\n${transcript}`,
+      contents: `Genera un examen de 5 preguntas de opción múltiple basado en el siguiente contenido educativo: \n\n${content}`,
       config: {
-        systemInstruction: "Eres un asistente académico experto en Inteligencia Artificial y Estrategia de Negocios. Resume de forma concisa con bullet points."
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              question: { type: Type.STRING },
+              options: { 
+                type: Type.ARRAY, 
+                items: { type: Type.STRING },
+                description: "4 opciones posibles"
+              },
+              correctAnswer: { 
+                type: Type.INTEGER,
+                description: "Índice de la respuesta correcta (0-3)"
+              }
+            },
+            required: ["question", "options", "correctAnswer"]
+          }
+        },
+        systemInstruction: "Eres un experto pedagogo. Crea preguntas desafiantes pero justas."
       }
     });
-    // Correctly extracting text output from GenerateContentResponse
-    return response.text || "No se pudo generar el resumen.";
+    return JSON.parse(response.text || "[]");
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return "Error al conectar con la IA.";
+    console.error("Gemini Quiz Error:", error);
+    return [];
   }
 };
 
-export const chatWithClass = async (transcript: string, question: string) => {
+export const summarizeContent = async (text: string | undefined) => {
+  if (!text) return "No hay contenido para resumir.";
   const ai = getAI();
   try {
     const response = await ai.models.generateContent({
-      // Using gemini-3-flash-preview for tutoring conversational tasks
       model: 'gemini-3-flash-preview',
-      contents: `Contexto de la clase: ${transcript}\n\nPregunta del alumno: ${question}`,
+      contents: `Resume este contenido de clase de forma ejecutiva: ${text}`,
+    });
+    return response.text || "No se pudo generar el resumen.";
+  } catch (error) {
+    return "Error al generar resumen.";
+  }
+};
+
+// Aliased to support ClassManager.tsx import
+export const summarizeTranscript = summarizeContent;
+
+// Added to support ClassDetail.tsx import
+export const chatWithClass = async (transcription: string | undefined, question: string) => {
+  if (!transcription) return "Lo siento, no hay transcripción disponible para responder.";
+  const ai = getAI();
+  try {
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: `Basándote en esta transcripción: "${transcription}", responde a la siguiente pregunta: ${question}`,
       config: {
-        systemInstruction: "Eres un tutor de IA disponible para los alumnos de la Fase 2 de AIWIS. Responde preguntas basándote únicamente en la información de la clase proporcionada."
+        systemInstruction: "Eres un tutor experto que ayuda a los estudiantes a entender el contenido de la clase. Responde de forma clara y concisa."
       }
     });
-    // Correctly extracting text output from GenerateContentResponse
-    return response.text || "Lo siento, no tengo esa información.";
+    return response.text || "No pude generar una respuesta.";
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return "Error en la consulta de IA.";
+    console.error("Gemini Chat Error:", error);
+    return "Lo siento, hubo un error al procesar tu pregunta.";
   }
 };

@@ -15,7 +15,7 @@ const ClassManager: React.FC<ClassManagerProps> = ({ onSelectClass }) => {
   const [summaries, setSummaries] = useState<Record<string, string>>({});
   const [loadingSummary, setLoadingSummary] = useState<string | null>(null);
 
-  const handleSummarize = async (id: string, transcript: string) => {
+  const handleSummarize = async (id: string, transcript: string | undefined) => {
     setLoadingSummary(id);
     const summary = await summarizeTranscript(transcript);
     setSummaries(prev => ({ ...prev, [id]: summary }));
@@ -65,7 +65,7 @@ const ClassManager: React.FC<ClassManagerProps> = ({ onSelectClass }) => {
               </p>
 
               <div className="flex flex-wrap gap-2 mb-6">
-                {cls.tags.map(tag => (
+                {cls.tags?.map(tag => (
                   <span key={tag} className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
                     #{tag}
                   </span>

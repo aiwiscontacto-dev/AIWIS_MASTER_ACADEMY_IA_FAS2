@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Users, Video, Clock, TrendingUp } from 'lucide-react';
 import { INITIAL_STUDENTS, INITIAL_CLASSES } from '../constants';
 
@@ -12,7 +12,7 @@ const Dashboard: React.FC = () => {
     { label: 'Compromiso IA', value: '88%', icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-100' },
   ];
 
-  const chartData = INITIAL_STUDENTS.map(s => ({ name: s.name.split(' ')[0], progreso: s.progress }));
+  const chartData = INITIAL_STUDENTS.map(s => ({ name: s.name.split(' ')[0], progreso: s.progress ?? 0 }));
 
   return (
     <div className="p-8 space-y-8 animate-fadeIn">

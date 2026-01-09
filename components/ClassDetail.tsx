@@ -54,7 +54,7 @@ const ClassDetail: React.FC<ClassDetailProps> = ({ cls, onBack }) => {
                 {cls.instructor}
               </div>
               <div className="flex gap-2">
-                {cls.tags.map(t => <span key={t} className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">#{t}</span>)}
+                {cls.tags?.map(t => <span key={t} className="text-xs font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded">#{t}</span>)}
               </div>
             </div>
             <div className="prose max-w-none">
